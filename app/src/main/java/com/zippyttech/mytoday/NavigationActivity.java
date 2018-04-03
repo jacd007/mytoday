@@ -44,6 +44,7 @@ public class NavigationActivity extends AppCompatActivity
     private SharedPreferences settings;
     private SharedPreferences.Editor editor;
     NoticiasDB noticiasDB;
+    public static boolean val=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +80,7 @@ public class NavigationActivity extends AppCompatActivity
             Toast.makeText(this,"Consultando BD...",Toast.LENGTH_SHORT).show();
         }
         else{
-            GetData getData = new GetData(this);
+            GetData getData = new GetData(this,0);
               getData.execute();
             Toast.makeText(this,"Consultando Servidor...",Toast.LENGTH_SHORT).show();
         }
@@ -94,6 +95,7 @@ public class NavigationActivity extends AppCompatActivity
     private LinearLayoutManager layoutManager;
     private RecyclerAdapter adapter;
 
+
     public void refreshCustomerList(List<Noticia> listado) {
         if (listado != null) {
            recyclerView.setHasFixedSize(true);
@@ -104,6 +106,8 @@ public class NavigationActivity extends AppCompatActivity
             recyclerView.setAdapter(adapter);
 
         }
+       // else Toast.makeText(this,"hay algo",Toast.LENGTH_SHORT).show();
+
     }
 
 
@@ -146,12 +150,21 @@ public class NavigationActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_delete) {
-                Toast.makeText(this, "Delete DB...",Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_insert) {
-                Toast.makeText(this, "Insert DB...",Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_update) {
-            noticiasDB.UpdateNoticiasDB();
+        if (id == R.id.nav_delete) { /** DELETE **/
+            noticiasDB.DeleteNoticiasDB();
+            settings.getBoolean("banderadb",false);
+            adapter.changeDataItem(noticiasDB.getList());
+
+        } else if (id == R.id.nav_insert) { /** INSERT **/
+                Toast.makeText(this,"INSERT",Toast.LENGTH_SHORT).show();
+
+        } else if (id == R.id.nav_update) { /** UPDATE **/
+
+          //  noticiasDB.UpdateNoticiasDB();
+           // refreshCustomerList(noticiasDB.getList());
+            GetData getData = new GetData(this,1);
+            getData.execute();
+
 
         } else if (id == R.id.nav_logout) {
             editor.clear();
@@ -171,8 +184,10 @@ public class NavigationActivity extends AppCompatActivity
     public class GetData extends AsyncTask<String,String,String> {
      private    ApiCall call;
      private ProgressDialog dialog;
-        public GetData(Context context){
+     private int UPDATE;
+        public GetData(Context context, int upd){
         this.call = new ApiCall(context);
+        this.UPDATE=upd;
         dialog = new ProgressDialog(context);
         dialog.setMessage("Cargando data");
         dialog.setIndeterminate(true);
@@ -203,11 +218,12 @@ public class NavigationActivity extends AppCompatActivity
                 for(int i=0; i<array.length(); i++) {
                     JSONObject item = array.getJSONObject(i);
                     Noticia noticia = new Noticia();
+                   String c = item.getJSONObject("excerpt").getString("rendered").replace("<p>","").replace("<strong>","").replace("&#8220","\"").replace("&#8221","\"");
                     noticia.setCodigo(String.valueOf(item.getInt("id")));
                     noticia.setTitulo(item.getJSONObject("title").getString("rendered"));
-                    noticia.setContenido(item.getJSONObject("excerpt").getString("rendered").replace("<p>",""));
+                    noticia.setContenido(c);
                     // noticia.setFecha(item.getString("date"));
-                    noticia.setFecha(item.getString("date").substring(0,10).replace("-","/"));
+                    noticia.setFecha("Fecha: "+item.getString("date").substring(0,16).replace("-","/").replace("T"," Hora: "));
                     noticia.setImagen("");
                     //    noticia.setFecha(item.getJSONObject("_links").getJSONArray("self").getJSONObject(0).getString("href"));
                     noticiaList.add(noticia);
@@ -216,7 +232,10 @@ public class NavigationActivity extends AppCompatActivity
                 noticiasDB.insertarNoticias(noticiaList);
                 editor.putBoolean("banderadb",true);
                 editor.commit();
+               if(UPDATE==0)
                 refreshCustomerList(noticiasDB.getList());
+               else
+                   adapter.changeDataItem(noticiasDB.getList());
 
             } catch (JSONException e) {
                 e.printStackTrace();

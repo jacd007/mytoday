@@ -136,10 +136,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     @Override
     public int getItemCount() {
+        if(listData!=null)
         return listData.size();
+        else return 0;
     }
 
-
+public void changeDataItem(List<Noticia> list){
+        listData = list;
+        notifyDataSetChanged();
+}
 
 
 }

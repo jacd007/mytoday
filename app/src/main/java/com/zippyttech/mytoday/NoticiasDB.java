@@ -73,16 +73,15 @@ public class NoticiasDB {
     }
 
     /**
-     * Update NoticiasDB*/
-    public void UpdateNoticiasDB (){
+     * Update NoticiasDB */
+    public void UpdateNoticiasDB( ){
             try {
+                    //Establecemos los campos-valores a actualizar
+                    ContentValues valores = new ContentValues();
+                    valores.put("titulo", "EL_Update");
 
-                //Establecemos los campos-valores a actualizar
-                ContentValues valores = new ContentValues();
-                valores.put("titulo","usunuevo");
-
-                //Actualizamos el registro en la base de datos
-                db.update("Noticia", valores, "codigo=28451", null);
+                    //Actualizamos el registro en la base de datos
+                    db.update("Noticia", valores, "codigo='28507'", null);
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -95,6 +94,14 @@ public class NoticiasDB {
     /**
      * Delete NoticiasDB*/
     public void DeleteNoticiasDB (){
+        try {
+
+           // db.execSQL("DROP TABLE IF EXISTS Noticia");
+            db.execSQL("DELETE FROM Noticia");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
         return;
     }
