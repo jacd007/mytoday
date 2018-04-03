@@ -1,7 +1,12 @@
 package com.zippyttech.mytoday;
 
+import android.app.ProgressDialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,7 +22,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.zippyttech.mytoday.common.ApiCall;
 import com.zippyttech.mytoday.models.Noticia;
+import com.zippyttech.mytoday.models.NoticiasSQLiteHelper;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +50,7 @@ public class NavigationActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -58,18 +62,16 @@ public class NavigationActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         recyclerView = findViewById(R.id.lista);
 
+      //GetData getData = new GetData(this);
+     // getData.execute();
+         NoticiasDB noticiasDB = new NoticiasDB(this);
+    refreshCustomerList(noticiasDB.getList());
+      //  noticiasDB.fillDB();
 
-        List<Noticia> noticiaList = new ArrayList<>();
+    }
 
-        noticiaList.add(new Noticia(1,"Un loco esta en el techo","Aqui va el contenido..."));
-        noticiaList.add(new Noticia(1,"Matan 20 gatos dando aplausos","Aqui va el contenido..."));
-        noticiaList.add(new Noticia(1,"Proximamente Rapidos y Furiosos Infinity","Aqui va el contenido..."));
-        noticiaList.add(new Noticia(1,"Maduro Deja el Poder y se va a Corea del Norte","Aqui va el contenido..."));
-        noticiaList.add(new Noticia(1,"1 $ = 0.1 Bs Economia Venezolana ","Aqui va el contenido..."));
-        noticiaList.add(new Noticia(1,"Un loco esta en el techo","Aqui va el contenido..."));
-        noticiaList.add(new Noticia(1,"Un loco esta en el techo","Aqui va el contenido..."));
+    public void llenarLista(){
 
-        refreshCustomerList(noticiaList);
     }
 
     private RecyclerView recyclerView;
@@ -149,4 +151,57 @@ public class NavigationActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+
+
+    public class GetData extends AsyncTask<String,String,String> {
+     private    ApiCall call;
+     private ProgressDialog dialog;
+        public GetData(Context context){
+        this.call = new ApiCall(context);
+        dialog = new ProgressDialog(context);
+        dialog.setMessage("Cargando data");
+        dialog.setIndeterminate(true);
+        dialog.show();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+             String resp = call.callGet("https://lanacionweb.com/wp-json/wp/v2/posts");
+            return resp;
+        }
+
+        @Override
+        protected void onPostExecute(String resp) {
+            super.onPostExecute(resp);
+            dialog.dismiss();
+            try {
+                JSONArray array = new JSONArray(resp);
+                List<Noticia> noticiaList = new ArrayList<>();
+
+                for(int i=0; i<array.length(); i++){
+                    JSONObject item = array.getJSONObject(i);
+                    Noticia noticia = new Noticia();
+                    noticia.setTitulo(item.getJSONObject("title").getString("rendered"));
+                    noticia.setContenido(item.getJSONObject("excerpt").getString("rendered"));
+                  //  noticia.setFecha(item.getJSONObject("date").getString("date"));
+                    noticia.setFecha(item.getJSONObject("_links").getJSONArray("self").getJSONObject(0).getString("href"));
+                    noticiaList.add(noticia);
+
+                }
+                refreshCustomerList(noticiaList);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }

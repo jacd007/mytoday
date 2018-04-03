@@ -10,7 +10,9 @@
         android:layout_height="wrap_content"
         android:text="Titulo"
         android:textColor="#000"
-        android:textSize="30sp"
+        android:textSize="20sp"
+        android:lines="2"
+        android:fontFamily="sans-serif-condensed"
         android:layout_marginLeft="10dp"
         android:id="@+id/titulo"/>
 
@@ -18,7 +20,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="contenido"
+        android:lines="3"
         android:layout_marginLeft="10dp"
         android:id="@+id/contenido"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fecha"
+        android:textSize="10dp"
+        android:textColor="@color/colorPrimary"
+        android:id="@+id/fecha"/>
 
 </LinearLayout>
