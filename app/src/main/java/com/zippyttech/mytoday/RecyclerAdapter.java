@@ -111,7 +111,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
-        holder.setData(listData.get(position).getId(),listData.get(position).getTitulo(),listData.get(position).getContenido(),listData.get(position).getfecha());
+        holder.setData(listData.get(position).getId(),listData.get(position).getTitulo(),listData.get(position).getContenido(),listData.get(position).getFecha());
         holder.setItemClickListener(new ItemClickListener() {
 
             @Override

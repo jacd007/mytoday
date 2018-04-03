@@ -13,7 +13,7 @@ import com.zippyttech.mytoday.NavigationActivity;
 public class NoticiasSQLiteHelper extends SQLiteOpenHelper {
 
     //Sentencia SQL para crear la tabla de Usuarios
-    String sqlCreate = "CREATE TABLE Usuarios (codigo INTEGER, nombre TEXT)";
+    String sqlCreate = "CREATE TABLE Noticia (codigo TEXT, titulo TEXT, contenido TEXT, fecha INTEGER, imagen TEXT)";
 
 
     public NoticiasSQLiteHelper(Context context, String tituloNoticia,

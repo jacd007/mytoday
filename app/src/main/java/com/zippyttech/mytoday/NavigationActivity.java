@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.zippyttech.mytoday.common.ApiCall;
 import com.zippyttech.mytoday.models.Noticia;
@@ -31,7 +32,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 public class NavigationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -39,7 +43,7 @@ public class NavigationActivity extends AppCompatActivity
     public static final String SHARED_KEY ="shared_key";
     private SharedPreferences settings;
     private SharedPreferences.Editor editor;
-
+    NoticiasDB noticiasDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +68,21 @@ public class NavigationActivity extends AppCompatActivity
 
       //GetData getData = new GetData(this);
      // getData.execute();
-         NoticiasDB noticiasDB = new NoticiasDB(this);
+      noticiasDB = new NoticiasDB(this);
     refreshCustomerList(noticiasDB.getList());
       //  noticiasDB.fillDB();
+
+        ArrayList<Noticia> lista_noticia= null;
+
+        if(settings.getBoolean("banderadb",false)){
+           refreshCustomerList(noticiasDB.getList()); ;
+            Toast.makeText(this,"Consultando BD...",Toast.LENGTH_SHORT).show();
+        }
+        else{
+            GetData getData = new GetData(this);
+              getData.execute();
+            Toast.makeText(this,"Consultando Servidor...",Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -130,15 +146,12 @@ public class NavigationActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
+        if (id == R.id.nav_delete) {
+                Toast.makeText(this, "Delete DB...",Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.nav_insert) {
+                Toast.makeText(this, "Insert DB...",Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.nav_update) {
+            noticiasDB.UpdateNoticiasDB();
 
         } else if (id == R.id.nav_logout) {
             editor.clear();
@@ -177,6 +190,8 @@ public class NavigationActivity extends AppCompatActivity
             return resp;
         }
 
+
+
         @Override
         protected void onPostExecute(String resp) {
             super.onPostExecute(resp);
@@ -185,17 +200,23 @@ public class NavigationActivity extends AppCompatActivity
                 JSONArray array = new JSONArray(resp);
                 List<Noticia> noticiaList = new ArrayList<>();
 
-                for(int i=0; i<array.length(); i++){
+                for(int i=0; i<array.length(); i++) {
                     JSONObject item = array.getJSONObject(i);
                     Noticia noticia = new Noticia();
+                    noticia.setCodigo(String.valueOf(item.getInt("id")));
                     noticia.setTitulo(item.getJSONObject("title").getString("rendered"));
-                    noticia.setContenido(item.getJSONObject("excerpt").getString("rendered"));
-                  //  noticia.setFecha(item.getJSONObject("date").getString("date"));
-                    noticia.setFecha(item.getJSONObject("_links").getJSONArray("self").getJSONObject(0).getString("href"));
+                    noticia.setContenido(item.getJSONObject("excerpt").getString("rendered").replace("<p>",""));
+                    // noticia.setFecha(item.getString("date"));
+                    noticia.setFecha(item.getString("date").substring(0,10).replace("-","/"));
+                    noticia.setImagen("");
+                    //    noticia.setFecha(item.getJSONObject("_links").getJSONArray("self").getJSONObject(0).getString("href"));
                     noticiaList.add(noticia);
 
                 }
-                refreshCustomerList(noticiaList);
+                noticiasDB.insertarNoticias(noticiaList);
+                editor.putBoolean("banderadb",true);
+                editor.commit();
+                refreshCustomerList(noticiasDB.getList());
 
             } catch (JSONException e) {
                 e.printStackTrace();
