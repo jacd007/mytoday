@@ -1,5 +1,6 @@
 package com.zippyttech.mytoday;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -44,7 +45,7 @@ public class NavigationActivity extends AppCompatActivity
     private SharedPreferences settings;
     private SharedPreferences.Editor editor;
     NoticiasDB noticiasDB;
-    public static boolean val=false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,6 +1,7 @@
 package com.zippyttech.mytoday;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -117,7 +118,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
             @Override
             public void onClick(View view, int position, boolean isLongClick, AppCompatActivity ap) {
                 if(!isLongClick){
-                    Toast.makeText(ap, "Noticia: "+listData.get(position).getTitulo(), Toast.LENGTH_SHORT).show();
+                //    Toast.makeText(ap, "Noticia: "+listData.get(position).getTitulo(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Actividad,ScrollingActivity.class);
+                intent.putExtra("title",listData.get(position).getTitulo());
+                    intent.putExtra("content",listData.get(position).getContenido());
+                Actividad.startActivity(intent);
                 }
             }
 
