@@ -1,6 +1,9 @@
 package com.zippyttech.mytoday;
 
 import android.app.Fragment;
+import android.net.Uri;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -39,7 +42,7 @@ import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
 public class NavigationActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     public static final String SHARED_KEY ="shared_key";
     private SharedPreferences settings;
@@ -56,8 +59,9 @@ public class NavigationActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
+    /*    Fragment1 fragmento1 = new Fragment1();
+        getSupportFragmentManager().beginTransaction().add(R.id.contenido,fragmento1);
+*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -157,7 +161,8 @@ public class NavigationActivity extends AppCompatActivity
             adapter.changeDataItem(noticiasDB.getList());
 
         } else if (id == R.id.nav_insert) { /** INSERT **/
-                Toast.makeText(this,"INSERT",Toast.LENGTH_SHORT).show();
+
+
 
         } else if (id == R.id.nav_update) { /** UPDATE **/
 
@@ -179,7 +184,10 @@ public class NavigationActivity extends AppCompatActivity
         return true;
     }
 
+   /* @Override
+    public void onFragmentInteraction(Uri uri) {
 
+    }*/
 
 
     public class GetData extends AsyncTask<String,String,String> {

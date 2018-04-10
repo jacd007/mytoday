@@ -30,6 +30,6 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Gention de la Base de Datos 'Noticias' " />
+        android:text="Gestion de la Base de Datos 'Noticias' " />
 
 </LinearLayout>
